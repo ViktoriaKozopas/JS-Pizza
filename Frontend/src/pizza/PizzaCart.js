@@ -3,6 +3,7 @@
  */
 var Templates = require('../Templates');
 var Storage = require('./Storage');
+var API = require('../API');
 
 //Перелік розмірів піци
 var PizzaSize = {
@@ -89,7 +90,12 @@ function updateCart() {
 
     //Онволення однієї піци
     function showOnePizzaInCart(cart_item) {
-        var html_code = Templates.PizzaCart_OneItem(cart_item);
+        var html_code;
+        if($(".clear-order").html() === undefined){
+            html_code = Templates.PizzaCart_OneItemSubmission(cart_item);
+        }else {
+            html_code = Templates.PizzaCart_OneItem(cart_item);
+        }
         var $node = $(html_code);
 
         $node.find(".plus").click(function () {
@@ -142,6 +148,17 @@ function updateCart() {
     }
 }
 
+function createOrder(callback) {
+    API.createOrder({
+        Name: $("#inputName").val(),
+        Phone: $("#inputPhone").val(),
+        Address: $("#inputAddress").val()
+    }, function (err, result) {
+        if(err) return callback(err);
+        callback(null,  result);
+    })
+}
+
 exports.removeFromCart = removeFromCart;
 exports.addToCart = addToCart;
 
@@ -150,3 +167,5 @@ exports.initialiseCart = initialiseCart;
 
 exports.clearCart = clearCart();
 exports.PizzaSize = PizzaSize;
+
+exports.createOrder = createOrder;
